@@ -46,6 +46,9 @@ jobs:
           api_location: "" # Update this path if your API code is in a different directory
           output_location: "" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+      # Add a step to run npx prisma generate
+      - name: Generate Prisma Client
+        run: npx prisma generate
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
