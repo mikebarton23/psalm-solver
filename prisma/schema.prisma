@@ -149,6 +149,7 @@ model daily_verse_view {
   order       Int
   book_order_in_testament Int
   quiz_date   String
+  total_verses_in_chapter   Int
 
   @@map("daily_verse_view")
   @@id([title_short, chapter, verse])

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import confetti from "canvas-confetti";
 import { Button } from "./ui/button";
 import HintComponent from "./hints";
@@ -7,19 +7,34 @@ import BibleBookSelect from "./ui/bibleBookSelect";
 import { oldTestamentBooks, newTestamentBooks } from "../data/BibleBooks";
 import { toast } from "sonner";
 
-function formatDate(dateString) {
+function formatDate(dateString: string) {
   if (!dateString) {
     return "";
   }
-  const options = { year: "numeric", month: "long", day: "numeric" };
   // Split the dateString into parts
   const [year, month, day] = dateString.split("-").map((part) => parseInt(part, 10));
   // Create a new Date object using local time
   const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString("en-US", options);
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
-function Modal({ showModal, onClose, dailyVerseDetails, guesses, currentGuessIndex, onShare, gameWon, hintsUsed }) {
+function Modal({
+  showModal,
+  onClose,
+  dailyVerseDetails,
+  guesses,
+  currentGuessIndex,
+  gameWon,
+  hintsUsed,
+}: {
+  showModal: boolean;
+  onClose: () => void;
+  dailyVerseDetails: any; // Replace 'any' with the actual type
+  guesses: any[]; // Replace 'any' with the actual type
+  currentGuessIndex: number;
+  gameWon: boolean;
+  hintsUsed: number;
+}) {
   if (!showModal) {
     return null;
   }
@@ -41,7 +56,6 @@ function Modal({ showModal, onClose, dailyVerseDetails, guesses, currentGuessInd
       .join("\n"); // Use '\n' for new lines in text, not '<br/>'
 
     const hintsUsedEmojis = "💡".repeat(hintsUsed);
-    const hintsUsedText = hintsUsed ? `Hints Used: ${hintsUsed}` : "No Hints Used";
 
     const shareText = `Psalm Solver ${dailyVerseDetails.quiz_date}:\n${hintsUsedEmojis}\n${emojiGridText}\nhttps://psalmsolver.com`;
 
@@ -107,7 +121,6 @@ function Modal({ showModal, onClose, dailyVerseDetails, guesses, currentGuessInd
 }
 
 export function Game() {
-  const [dailyVerseDetails, setDailyVerseDetails] = useState({});
   const [guesses, setGuesses] = useState(Array(6).fill(null));
   const [currentBook, setCurrentBook] = useState("");
   const [currentChapter, setCurrentChapter] = useState("");
@@ -118,53 +131,20 @@ export function Game() {
   const [hintsUsed, setHintsUsed] = useState(0);
 
   const [showModal, setShowModal] = useState(false);
-  const formattedDate = formatDate(dailyVerseDetails.quiz_date);
-
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  };
-  // Combine Old Testament and New Testament books for search suggestions
-  const allBibleBooks = [...oldTestamentBooks, ...newTestamentBooks];
-
-  // Handler for book input changes
-  const handleBookInputChange = (event) => {
-    setCurrentBook(event.target.value);
-    setShowSuggestions(true);
-  };
-
-  const copyToClipboard = async (text) => {
-    // Directly use the clipboard API within the user-triggered event
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(
-        function () {
-          alert("Results copied to clipboard!");
-        },
-        function (err) {
-          console.error("Could not copy text: ", err);
-          // Fallback: Provide a selectable textarea for manual copying as a last resort
-        }
-      );
-    } else {
-      // Fallback: Provide a selectable textarea for manual copying as a last resort
-    }
-  };
-
-  const shareResults = () => {
-    const resultEmojis = guesses.map((guess) => (guess ? (guess.correct ? "🟩" : "⬛") : "")).join("");
-    const hintsUsed = "Hints used: " + (dailyVerseDetails.hintsUsed || 0);
-    const shareText = `ScriptureSavant Results:\n${resultEmojis}\n${hintsUsed}\nJoin the fun at https://scripturesavant.com`;
-    copyToClipboard(shareText);
-    alert("Results copied to clipboard!"); // Provide feedback to the user
-  };
-
-  // Filter books based on user input
-  const bookSuggestions = currentBook ? allBibleBooks.filter((book) => book.toLowerCase().includes(currentBook.toLowerCase())) : [];
-
-  // Handler for book selection from suggestions
-  const handleBookSelection = (bookName) => {
-    setCurrentBook(bookName);
-    setShowSuggestions(false);
-  };
+  const [dailyVerseDetails, setDailyVerseDetails] = useState({
+    title_short: "",
+    chapter: 0,
+    verse: 0,
+    text: "",
+    pct_through: 0,
+    category: "",
+    otnt: "",
+    chapters: 0,
+    order: 0,
+    book_order_in_testament: 0,
+    quiz_date: "",
+    total_verses_in_chapter: 0,
+  });
 
   useEffect(() => {
     fetch("/api/dailyVerse")
@@ -172,6 +152,18 @@ export function Game() {
       .then((data) => setDailyVerseDetails(data))
       .catch((error) => console.error("Error fetching daily verse:", error));
   }, []);
+
+  const formattedDate = formatDate(dailyVerseDetails.quiz_date);
+
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  };
+
+  // Handler for book selection from suggestions
+  const handleBookSelection = (bookName: string) => {
+    setCurrentBook(bookName);
+    setShowSuggestions(false);
+  };
 
   const handleWin = () => {
     setShowModal(true);
@@ -182,7 +174,7 @@ export function Game() {
     setShowModal(true);
   };
 
-  const handleGuessSubmit = async (event) => {
+  const handleGuessSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     const isGuessCorrect = currentBook === dailyVerseDetails.title_short && parseInt(currentChapter, 10) === dailyVerseDetails.chapter && parseInt(currentVerse, 10) === dailyVerseDetails.verse;
@@ -250,16 +242,6 @@ export function Game() {
                 // Input fields for the current guess
                 <>
                   <div className="col-span-6 relative h-2">
-                    {/* <input className="w-full p-2 bg-gray-700 text-white text-xl" value={currentBook} onChange={handleBookInputChange} placeholder="Book" autoFocus={index === currentGuessIndex} />
-                    {showSuggestions && (
-                      <ul className="absolute z-10 list-none bg-black text-white max-h-60 overflow-auto w-full">
-                        {bookSuggestions.slice(0, 6).map((suggestion, idx) => (
-                          <li key={idx} className="p-2 cursor-pointer hover:bg-gray-900" onClick={() => handleBookSelection(suggestion)}>
-                            {suggestion}
-                          </li>
-                        ))}
-                      </ul>
-                    )} */}
                     <BibleBookSelect onChange={handleBookSelection} />
                   </div>
                   <input
@@ -315,7 +297,10 @@ export function Game() {
             </Button>
           ) : (
             currentGuessIndex < guesses.length && (
-              <Button onClick={handleGuessSubmit} className="flex items-center justify-center w-full mt-2 bg-blue-500 text-white p-2 rounded hover:bg-blue-700">
+              <Button
+                onClick={(event: React.MouseEvent<HTMLButtonElement>) => handleGuessSubmit(event)}
+                className="flex items-center justify-center w-full mt-2 bg-blue-500 text-white p-2 rounded hover:bg-blue-700"
+              >
                 Submit Guess
               </Button>
             )
@@ -326,7 +311,6 @@ export function Game() {
       <Modal
         showModal={showModal}
         dailyVerseDetails={dailyVerseDetails}
-        onShare={shareResults} // Pass the share handling function as a prop
         onClose={() => setShowModal(false)}
         guesses={guesses}
         hintsUsed={hintsUsed}

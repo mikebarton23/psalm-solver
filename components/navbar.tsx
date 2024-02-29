@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 
 export default function Component() {
@@ -21,19 +20,41 @@ export default function Component() {
                 <span className="sr-only">Help</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-black text-white">
+            <DialogContent className="bg-gray-900 text-white p-4">
               <DialogHeader>
-                <DialogTitle className="text-white text-xl">How to Play</DialogTitle>
-                <DialogDescription className="text-white text-md">
-                  <p className="mb-2">Guess the book, chapter, and verse of the daily Bible verse.</p>
-                  <p className="mb-2">Click the "Reveal Hint" button to get a hint.</p>
-                  <p className="mb-2">If any of your choices are correct, they will be outlined in green.</p>
-                  <Separator />
-                  <p className="mt-2">Share your result with friends!</p>
-                  <p className="mt-2">Click the "Donate" button if you want to send us a tip 😊</p>
-                </DialogDescription>
+                <DialogTitle className="text-white text-2xl font-bold mb-4">How to Play</DialogTitle>
               </DialogHeader>
-              <DialogFooter></DialogFooter>
+
+              <DialogDescription className="text-white text-md">
+                <p className="mb-4">Join us daily for a spiritual challenge using the American Standard Version of the Bible:</p>
+                <ul className="list-disc list-inside mb-4" style={{ marginLeft: "1.5rem", textIndent: "-1.5rem" }}>
+                  <li>
+                    Each day, a new verse is featured; take a guess on the <strong>book</strong>, <strong>chapter</strong>, and <strong>verse number</strong>.
+                  </li>
+                  <li>
+                    Not sure? Click <strong>"Reveal Hint"</strong> for a nudge in the right direction.
+                  </li>
+                  <li>
+                    Correct parts of your guess will be marked in a <span className="text-green-500 font-bold">green outline</span>.
+                  </li>
+                  <li>
+                    Got it right? Go on and <strong>share your success</strong> with friends!
+                  </li>
+                  <li>
+                    A fresh verse appears <strong>every day at midnight</strong>—come back daily for a new challenge.
+                  </li>
+                </ul>
+                <Separator className="my-4" />
+                <p>Love the game? Your donation supports our work and keeps the daily verses coming. Every bit helps!</p>
+              </DialogDescription>
+
+              <DialogFooter className="flex justify-center items-center mt-4">
+                <Button className="text-white bg-gradient-to-r from-purple-500 to-indigo-500">
+                  <a href="https://ko-fi.com/fantasygeniushq" target="_blank" rel="noopener noreferrer">
+                    Donate
+                  </a>
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
           <Button className="text-white bg-gradient-to-r from-purple-500 to-indigo-500">
@@ -47,7 +68,7 @@ export default function Component() {
   );
 }
 
-function HelpCircleIcon(props) {
+function HelpCircleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" />
@@ -57,19 +78,10 @@ function HelpCircleIcon(props) {
   );
 }
 
-function PlayIcon(props) {
+function PlayIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="5 3 19 12 5 21 5 3" />
-    </svg>
-  );
-}
-
-function SettingsIcon(props) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
