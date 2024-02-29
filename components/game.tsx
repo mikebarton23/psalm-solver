@@ -23,15 +23,6 @@ function Modal({ showModal, onClose, dailyVerseDetails, guesses, currentGuessInd
   if (!showModal) {
     return null;
   }
-  const [copySuccess, setCopySuccess] = useState("");
-
-  const copyToClipboard = (e) => {
-    const text = e.target.getAttribute("data-clipboard-text");
-    navigator.clipboard.writeText(text).then(
-      () => setCopySuccess("Copied!"),
-      (err) => setCopySuccess("Failed to copy!")
-    );
-  };
 
   const emojiGrid = guesses
     .filter((guess) => guess !== null)
