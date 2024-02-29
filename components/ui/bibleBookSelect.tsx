@@ -1,7 +1,11 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-import Select from "react-select";
+import Select, { GroupBase } from "react-select";
+
 import { newTestamentBooks, oldTestamentBooks } from "@/data/BibleBooks";
+
+type OptionType = { label: string; value: string };
+type GroupType = GroupBase<OptionType>;
 
 // Prepare your Bible books data for react-select
 const groupedOptions = [
@@ -21,7 +25,8 @@ const groupStyles = {
   justifyContent: "space-between",
   width: "100%",
 };
-const groupBadgeStyles = {
+
+const groupBadgeStyles: React.CSSProperties = {
   backgroundColor: "#374151",
   borderRadius: "2em",
   color: "#fff",
@@ -33,16 +38,9 @@ const groupBadgeStyles = {
   padding: "0.16666666666667em 0.5em",
   textAlign: "center",
 };
-
-const formatGroupLabel = (data) => (
-  <div style={groupStyles}>
-    <span>{data.label}</span>
-    <span style={groupBadgeStyles}>{data.options.length}</span>
-  </div>
-);
-export default function BibleBooksSelect({ onChange }) {
+export default function BibleBooksSelect({ onChange }: { onChange: (value: string) => void }) {
   const customStyles = {
-    control: (base) => ({
+    control: (base: any) => ({
       ...base,
       backgroundColor: "#2D3748", // Tailwind bg-gray-700
       borderColor: "#4A5568", // Tailwind border-gray-600 for a slight contrast
@@ -55,12 +53,12 @@ export default function BibleBooksSelect({ onChange }) {
       },
       minHeight: "100%", // Ensure control expands to the full height
     }),
-    menu: (base) => ({
+    menu: (base: any) => ({
       ...base,
       backgroundColor: "#2D3748", // Tailwind bg-gray-700 for the dropdown
       color: "#fff", // Ensure menu text is white
     }),
-    option: (base, state) => ({
+    option: (base: any, state: { isFocused: any }) => ({
       ...base,
       backgroundColor: state.isFocused ? "#4A5568" : "#2D3748", // Tailwind bg-gray-600 for focused and bg-gray-700 for default
       color: "#fff", // Ensure option text is white
@@ -68,32 +66,39 @@ export default function BibleBooksSelect({ onChange }) {
         backgroundColor: "#2C5282", // Tailwind bg-blue-700 for active
       },
     }),
-    singleValue: (base) => ({
+    singleValue: (base: any) => ({
       ...base,
       color: "#fff", // Ensure selected value text is white
       fontSize: "1.25rem", // Adjust the font size as needed
     }),
-    input: (base) => ({
+    input: (base: any) => ({
       ...base,
       color: "#fff", // Ensure input text is white
       fontSize: "14px", // Adjust the font size as needed
     }),
-    placeholder: (base) => ({
+    placeholder: (base: any) => ({
       ...base,
       color: "#A0AEC0", // Lighter color for placeholder, similar to Tailwind text-gray-400
       fontSize: "1rem", // Adjust the font size as needed
     }),
-    valueContainer: (provided, state) => ({
+    valueContainer: (provided: any, state: any) => ({
       ...provided,
       height: "41px",
       padding: "0 6px",
     }),
-    groupHeading: (base) => ({
+    groupHeading: (base: any) => ({
       ...base,
       color: "#A0AEC0", // Tailwind text-gray-400 for the group labels
       fontSize: "14px", // Adjust the font size as needed
     }),
   };
+
+  const formatGroupLabel = (group: GroupType) => (
+    <div style={groupStyles}>
+      {group.label}
+      <span style={groupBadgeStyles}>{group.options.length}</span>
+    </div>
+  );
 
   return (
     <Select
@@ -101,7 +106,11 @@ export default function BibleBooksSelect({ onChange }) {
       formatGroupLabel={formatGroupLabel}
       styles={customStyles}
       isClearable={true}
-      onChange={(selectedOption) => onChange(selectedOption ? selectedOption.value : "")} // Call the passed onChange function with the selected value />;
+      onChange={(selectedOption: OptionType | null) => {
+        // If selectedOption is not null, use its value; otherwise, use an empty string
+        const value = selectedOption ? selectedOption.value : "";
+        onChange(value);
+      }}
     />
   );
 }
