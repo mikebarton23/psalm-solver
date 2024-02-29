@@ -238,7 +238,7 @@ export function Game() {
     <>
       <main className="flex flex-col items-center  min-h-screen bg-black p-4">
         <div className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 rounded-lg shadow-2xl p-8 space-y-4 max-w-xl w-full mt-8 mb-4 border border-gray-600">
-          <h1 className="text-3xl font-bold text-gray-100">Verse of the Day</h1>
+          <h1 className="text-3xl font-bold text-gray-100">Today's Verse</h1>
 
           <p className="text-lg leading-relaxed text-gray-300 ">{dailyVerseDetails.text}</p>
 
