@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  email    String  @unique
+  stats    Stats[]
+}
+
+model Stats {
+  id        Int  @id @default(autoincrement())
+  userId    Int
+  dailyWins Int  @default(0)
+  streak    Int  @default(0)
+  user      User @relation(fields: [userId], references: [id])
+}
+
+model bible_version_key {
+  id             Int    @id
+  table          String
+  abbreviation   String
+  language       String
+  version        String
+  info_text      String
+  info_url       String
+  publisher      String
+  copyright      String
+  copyright_info String
+}
+
+model book_info {
+  order        Int    @id @unique(map: "book_info_order")
+  title_short  String @unique(map: "book_info_title_short")
+  title_full   String @unique(map: "book_info_title_full")
+  abbreviation String @unique(map: "book_info_abbreviation")
+  category     String
+  otnt         String
+  chapters     Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cross_reference {
+  vid Int
+  r   Int
+  sv  Int
+  ev  Int
+
+  @@index([vid], map: "cross_reference_vid")
+  @@ignore
+}
+
+model key_abbreviations_english {
+  id Int    @id @db.SmallInt
+  a  String @db.VarChar(255)
+  b  Int    @db.SmallInt
+  p  Int
+}
+
+model key_english {
+  b Int    @id
+  n String
+  t String @db.VarChar(2)
+  g Int
+}
+
+model key_genre_english {
+  g Int    @id
+  n String @db.VarChar(255)
+}
+
+model t_asv {
+  id Int    @id @unique(map: "t_asv_id_3")
+  b  Int
+  c  Int
+  v  Int
+  t  String
+
+  @@index([id], map: "t_asv_id")
+  @@index([id], map: "t_asv_id_2")
+  @@index([id], map: "t_asv_id_4")
+  @@index([id], map: "t_asv_id_5")
+  @@index([id], map: "t_asv_id_6")
+  @@index([id], map: "t_asv_id_7")
+  @@index([id], map: "t_asv_id_8")
+}
+
+model t_bbe {
+  id Int    @id @unique(map: "t_bbe_id")
+  b  Int
+  c  Int
+  v  Int
+  t  String
+
+  @@index([id], map: "t_bbe_id_2")
+}
+
+model t_kjv {
+  id Int    @id @unique(map: "t_kjv_id_2")
+  b  Int
+  c  Int
+  v  Int
+  t  String
+
+  @@index([id], map: "t_kjv_id")
+}
+
+model t_web {
+  id Int    @id @unique(map: "t_web_id_2")
+  b  Int
+  c  Int
+  v  Int
+  t  String
+
+  @@index([id], map: "t_web_id")
+}
+
+model t_ylt {
+  id Int    @id @unique(map: "t_ylt_id_2")
+  b  Int
+  c  Int
+  v  Int
+  t  String
+
+  @@index([id], map: "t_ylt_id")
+}
+
+model verse_metadata {
+  id         Int     @id
+  verse_num  Int
+  pct_through Float
+}
+
+model daily_verse_view {
+  title_short String
+  chapter     Int
+  verse       Int
+  text        String
+  pct_through Float
+  category    String
+  otnt        String
+  chapters    Int
+  order       Int
+  book_order_in_testament Int
+  quiz_date   String
+
+  @@map("daily_verse_view")
+  @@id([title_short, chapter, verse])
+}
