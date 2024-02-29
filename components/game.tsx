@@ -23,15 +23,6 @@ function Modal({ showModal, onClose, dailyVerseDetails, guesses, currentGuessInd
   if (!showModal) {
     return null;
   }
-  const [copySuccess, setCopySuccess] = useState("");
-
-  const copyToClipboard = (e) => {
-    const text = e.target.getAttribute("data-clipboard-text");
-    navigator.clipboard.writeText(text).then(
-      () => setCopySuccess("Copied!"),
-      (err) => setCopySuccess("Failed to copy!")
-    );
-  };
 
   const emojiGrid = guesses
     .filter((guess) => guess !== null)
@@ -109,7 +100,6 @@ function Modal({ showModal, onClose, dailyVerseDetails, guesses, currentGuessInd
           <button onClick={shareResults} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             Copy Results
           </button>
-          {copySuccess && <div className="text-green-500">{copySuccess}</div>}
         </div>
       </div>
     </div>
