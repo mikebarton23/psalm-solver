@@ -31,7 +31,7 @@ const groupBadgeStyles: React.CSSProperties = {
   borderRadius: "2em",
   color: "#fff",
   display: "inline-block",
-  fontSize: 12,
+  fontSize: 16,
   fontWeight: "normal",
   lineHeight: "1",
   minWidth: 1,
@@ -52,11 +52,14 @@ export default function BibleBooksSelect({ onChange }: { onChange: (value: strin
         borderColor: "#718096", // Tailwind border-gray-500 on hover
       },
       minHeight: "100%", // Ensure control expands to the full height
+      fontSize: "16px",
     }),
     menu: (base: any) => ({
       ...base,
       backgroundColor: "#2D3748", // Tailwind bg-gray-700 for the dropdown
       color: "#fff", // Ensure menu text is white
+      // Apply font size here as well if menu items are too small
+      fontSize: "16px",
     }),
     option: (base: any, state: { isFocused: any }) => ({
       ...base,
@@ -65,31 +68,36 @@ export default function BibleBooksSelect({ onChange }: { onChange: (value: strin
       "&:active": {
         backgroundColor: "#2C5282", // Tailwind bg-blue-700 for active
       },
+      // Apply font size here to ensure consistency
+      fontSize: "16px",
     }),
     singleValue: (base: any) => ({
       ...base,
       color: "#fff", // Ensure selected value text is white
-      fontSize: "1.25rem", // Adjust the font size as needed
+      // Adjusting here ensures selected value matches the desired size
+      fontSize: "1.25rem", // Adjusted from "1.25rem" to ensure minimum 16px
     }),
     input: (base: any) => ({
       ...base,
       color: "#fff", // Ensure input text is white
-      fontSize: "14px", // Adjust the font size as needed
+      fontSize: "16px", // Adjust the font size as needed
     }),
     placeholder: (base: any) => ({
       ...base,
       color: "#A0AEC0", // Lighter color for placeholder, similar to Tailwind text-gray-400
-      fontSize: "1rem", // Adjust the font size as needed
+      fontSize: "16px", // Adjust the font size as needed
     }),
     valueContainer: (provided: any, state: any) => ({
       ...provided,
       height: "41px",
       padding: "0 6px",
+      fontSize: "1.25rem",
+      // Ensuring the container respects the font size change
     }),
     groupHeading: (base: any) => ({
       ...base,
       color: "#A0AEC0", // Tailwind text-gray-400 for the group labels
-      fontSize: "14px", // Adjust the font size as needed
+      fontSize: "16px", // Adjust the font size as needed
     }),
   };
 

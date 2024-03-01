@@ -21,7 +21,7 @@ export default function Component() {
                 <span className="sr-only">Help</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-gray-900 text-white p-4">
+            <DialogContent className="bg-gray-900 text-white p-4 overflow-y-auto max-h-[85vh] w-full max-w-md">
               <DialogHeader>
                 <DialogTitle className="text-white text-2xl font-bold mb-4">How to Play</DialogTitle>
               </DialogHeader>
@@ -93,7 +93,7 @@ export default function Component() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <Button className="text-white bg-gradient-to-r from-purple-500 to-indigo-500" size="sm">
+          <Button className="text-white  text-sm bg-gradient-to-r from-purple-500 to-indigo-500" size="sm">
             <a href="https://ko-fi.com/builtbymike" target="_blank" rel="noopener noreferrer">
               Donate
             </a>

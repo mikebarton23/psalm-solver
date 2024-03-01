@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import HintComponent from "./hints";
 import BibleBookSelect from "./ui/bibleBookSelect";
 import { oldTestamentBooks, newTestamentBooks } from "../data/BibleBooks";
+import { FormEvent } from "react";
 import { toast } from "sonner";
 
 function formatDate(dateString: string) {
@@ -68,7 +69,7 @@ function Modal({
   return (
     // Overlay
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-      <div className="bg-gray-900 p-5 rounded-lg max-w-xl mx-auto z-50">
+      <div className="bg-gray-900 p-5 rounded-lg max-w-xl mx-3 z-50">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-white">Today's Results</h2>
           <button onClick={onClose} className="text-white">
@@ -183,8 +184,15 @@ export function Game() {
     setShowModal(true);
   };
 
-  const handleGuessSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevent the default action to avoid any form submission if applicable
+      submitGuess();
+    }
+  };
+
+  const handleGuessSubmit = (event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault(); // This will now work for both form submissions and button clicks
 
     const isGuessCorrect = currentBook === dailyVerseDetails.title_short && parseInt(currentChapter, 10) === dailyVerseDetails.chapter && parseInt(currentVerse, 10) === dailyVerseDetails.verse;
 
@@ -262,6 +270,10 @@ export function Game() {
     }
   };
 
+  const submitGuess = () => {
+    handleGuessSubmit(new Event("submit") as FormEvent<HTMLFormElement>);
+  };
+
   const triggerConfetti = () => {
     confetti({
       particleCount: 5000,
@@ -276,7 +288,7 @@ export function Game() {
       <main className="flex justify-center items-center min-h-screen bg-black p-4">
         <div className="flex justify-center items-center">
           <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">-------</span>
           </div>
         </div>
       </main>
@@ -288,97 +300,102 @@ export function Game() {
       <main className="flex flex-col items-center  min-h-screen bg-black p-4">
         <div className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 rounded-lg shadow-2xl p-4 space-y-4 max-w-xl w-full mt-2 mb-0 border border-gray-600">
           <div className="flex items-center">
-            <span className="inline-flex items-center px-4 py-1 rounded-full text-sm font-semibold bg-blue-500 text-gray-100">{formattedDate}</span>
+            <span className="inline-flex items-center px-4 py-1 rounded-full text-xs md:text-md  bg-blue-500 text-gray-100">{formattedDate}</span>
           </div>
-          <p className="text-lg leading-relaxed text-gray-300 ">{dailyVerseDetails.text}</p>
+          <p className="text-gray-300 text-sm md:text-lg">{dailyVerseDetails.text}</p>
         </div>
 
         <div className="w-full max-w-xl bg-black rounded-lg shadow-md p-6 text-white">
-          <div className="grid grid-cols-10 mb-4 gap-y-10 text-lg font-bold">
+          <div className="grid grid-cols-10 mb-4 gap-y-10  text-sm font-bold">
             <div className="col-span-6 text-left">Book</div>
             <div className="col-span-2 text-center">Chapter</div>
             <div className="col-span-2 text-center">Verse</div>
           </div>
+          <form onSubmit={handleGuessSubmit} className="w-full max-w-xl bg-black rounded-lg shadow-md p-6 text-white">
+            {guesses.map((guess, index) => (
+              <div key={index} className="grid grid-cols-10 gap-x-2 gap-y-3 mb-2">
+                {index === currentGuessIndex && !gameWon ? (
+                  // Input fields for the current guess
+                  <>
+                    <div className="col-span-6 relative h-2">
+                      <BibleBookSelect onChange={handleBookSelection} />
+                    </div>
+                    <input
+                      className="col-span-2 p-2 bg-gray-700 text-white h-11 text-center text-bold text-xl rounded"
+                      value={currentChapter}
+                      onChange={(e) => setCurrentChapter(e.target.value)}
+                      onKeyDown={handleKeyPress} // Attach here
+                      type="number"
+                    />
 
-          {guesses.map((guess, index) => (
-            <div key={index} className="grid grid-cols-10 gap-x-2 gap-y-3 mb-2">
-              {index === currentGuessIndex && !gameWon ? (
-                // Input fields for the current guess
-                <>
-                  <div className="col-span-6 relative h-2">
-                    <BibleBookSelect onChange={handleBookSelection} />
-                  </div>
-                  <input
-                    className="col-span-2 p-2 bg-gray-700 text-white h-11 text-center text-bold text-xl rounded"
-                    value={currentChapter}
-                    onChange={(e) => setCurrentChapter(e.target.value)}
-                    placeholder=""
-                    type="number"
-                  />
-                  <input
-                    className="col-span-2 p-2 bg-gray-700 text-white h-11 text-center text-bold text-xl rounded"
-                    value={currentVerse}
-                    onChange={(e) => setCurrentVerse(e.target.value)}
-                    placeholder=""
-                    type="number"
-                  />
-                </>
-              ) : (
-                // Static text for previous guesses
-                <>
-                  <div
-                    className={`col-span-6 p-2 relative ${
-                      guess?.book ? (guess.bookCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
-                    } h-11 flex items-center text-xl font-bold rounded`}
-                  >
-                    {guess?.book || ""}
-                    {/* Ensure the indicator is within the visible bounds of its container */}
+                    <input
+                      className="col-span-2 p-2 bg-gray-700 text-white h-11 text-center text-bold text-xl rounded"
+                      value={currentVerse}
+                      onChange={(e) => setCurrentVerse(e.target.value)}
+                      onKeyDown={handleKeyPress} // And here
+                      type="number"
+                    />
+                  </>
+                ) : (
+                  // Static text for previous guesses
+                  <>
                     <div
-                      className={`absolute bottom-0 left-0 right-0 h-1 ${guess?.bookProximity === "close" ? "bg-orange-500" : guess?.bookProximity === "far" ? "bg-blue-500" : "bg-transparent"}`}
-                    ></div>
-                  </div>
-                  <div
-                    className={`col-span-2 p-2 relative ${
-                      guess?.chapter ? (guess.chapterCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
-                    } h-11 flex items-center justify-center text-xl font-bold rounded`}
-                  >
-                    {guess?.chapter || " "}
+                      className={`col-span-6 p-2 relative ${
+                        guess?.book ? (guess.bookCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
+                      } h-11 flex items-center text-xl font-bold rounded`}
+                    >
+                      {guess?.book || ""}
+                      {/* Ensure the indicator is within the visible bounds of its container */}
+                      <div
+                        className={`absolute bottom-0 left-0 right-0 h-1 ${guess?.bookProximity === "close" ? "bg-orange-500" : guess?.bookProximity === "far" ? "bg-blue-500" : "bg-transparent"}`}
+                      ></div>
+                    </div>
                     <div
-                      className={`absolute bottom-0 left-0 right-0 h-1 ${guess?.chapterProximity === "close" ? "bg-orange-500" : guess?.chapterProximity === "far" ? "bg-blue-500" : "bg-transparent"}`}
-                    ></div>
-                  </div>
-                  <div
-                    className={`col-span-2 p-2 relative ${
-                      guess?.verse ? (guess.verseCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
-                    } h-11 flex items-center justify-center text-xl font-bold rounded`}
-                  >
-                    {guess?.verse || " "}
+                      className={`col-span-2 p-2 relative ${
+                        guess?.chapter ? (guess.chapterCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
+                      } h-11 flex items-center justify-center text-xl font-bold rounded`}
+                    >
+                      {guess?.chapter || " "}
+                      <div
+                        className={`absolute bottom-0 left-0 right-0 h-1 ${
+                          guess?.chapterProximity === "close" ? "bg-orange-500" : guess?.chapterProximity === "far" ? "bg-blue-500" : "bg-transparent"
+                        }`}
+                      ></div>
+                    </div>
                     <div
-                      className={`absolute bottom-0 left-0 right-0 h-1 ${guess?.verseProximity === "close" ? "bg-orange-500" : guess?.verseProximity === "far" ? "bg-blue-500" : "bg-transparent"}`}
-                    ></div>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                      className={`col-span-2 p-2 relative ${
+                        guess?.verse ? (guess.verseCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
+                      } h-11 flex items-center justify-center text-xl font-bold rounded`}
+                    >
+                      {guess?.verse || " "}
+                      <div
+                        className={`absolute bottom-0 left-0 right-0 h-1 ${guess?.verseProximity === "close" ? "bg-orange-500" : guess?.verseProximity === "far" ? "bg-blue-500" : "bg-transparent"}`}
+                      ></div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
 
-          {gameWon || currentGuessIndex === guesses.length ? (
-            <Button
-              onClick={toggleModal} // Toggle modal on click
-              className="mt-4 bg-green-500 text-white p-2 w-full hover:bg-green"
-            >
-              Share
-            </Button>
-          ) : (
-            currentGuessIndex < guesses.length && (
+            {gameWon || currentGuessIndex === guesses.length ? (
               <Button
-                onClick={(event: React.MouseEvent<HTMLButtonElement>) => handleGuessSubmit(event)}
-                className="flex items-center justify-center w-full mt-2 bg-blue-500 text-white p-2 rounded hover:bg-blue-700"
+                type="button" // Ensure this button does not submit the form
+                onClick={toggleModal} // Toggle modal on click
+                className="mt-4 bg-green-500 text-white p-2 w-full hover:bg-green"
               >
-                Submit Guess
+                Share
               </Button>
-            )
-          )}
+            ) : (
+              currentGuessIndex < guesses.length && (
+                <Button
+                  type="submit" // This button will now submit the form
+                  className="flex items-center justify-center w-full mt-2 bg-blue-500 text-white p-2 rounded hover:bg-blue-700"
+                >
+                  Submit Guess
+                </Button>
+              )
+            )}
+          </form>
         </div>
         <HintComponent dailyVerseDetails={dailyVerseDetails} hintsUsed={hintsUsed} setHintsUsed={setHintsUsed} />
       </main>
