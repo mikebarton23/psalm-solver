@@ -13,10 +13,10 @@ const groupedOptions = [
     label: "New Testament",
     options: newTestamentBooks.map((book) => ({ label: book, value: book })),
   },
-  {
-    label: "Old Testament",
-    options: oldTestamentBooks.map((book) => ({ label: book, value: book })),
-  },
+  // {
+  //   label: "Old Testament",
+  //   options: oldTestamentBooks.map((book) => ({ label: book, value: book })),
+  // },
 ];
 
 const groupStyles = {

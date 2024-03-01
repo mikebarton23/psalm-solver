@@ -3,14 +3,15 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 
 export default function Component() {
   return (
-    <header className="dark flex h-20 w-full items-center px-4 md:px-6 bg-gray-900 text-white">
+    <header className="dark flex h-11 w-full items-center px-4 md:px-6 bg-gray-900 text-white">
       <div className="w-full flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <PlayIcon className="h-6 w-6" />
-          <span className="text-2xl font-semibold">Psalm Solver</span>
+        <div className="flex items-center gap-1">
+          <Image src="/logo.svg" alt="Psalm Solver" width={30} height={30} />
+          <span className="text-xl font-semibold">Psalm Solver</span>
         </div>
         <div className="flex items-center gap-4">
           <Dialog>
@@ -92,7 +93,7 @@ export default function Component() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <Button className="text-white bg-gradient-to-r from-purple-500 to-indigo-500">
+          <Button className="text-white bg-gradient-to-r from-purple-500 to-indigo-500" size="sm">
             <a href="https://ko-fi.com/builtbymike" target="_blank" rel="noopener noreferrer">
               Donate
             </a>

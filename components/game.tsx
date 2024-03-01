@@ -147,12 +147,19 @@ export function Game() {
     quiz_date: "",
     total_verses_in_chapter: 0,
   });
+  const [verseLoading, setVerseLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/dailyVerse2")
       .then((response) => response.json())
-      .then((data) => setDailyVerseDetails(data))
-      .catch((error) => console.error("Error fetching daily verse:", error));
+      .then((data) => {
+        setDailyVerseDetails(data);
+        setVerseLoading(false); // Stop loading after data is fetched
+      })
+      .catch((error) => {
+        console.error("Error fetching daily verse:", error);
+        setVerseLoading(false); // Stop loading if there's an error
+      });
   }, []);
 
   const formattedDate = formatDate(dailyVerseDetails.quiz_date);
@@ -264,17 +271,26 @@ export function Game() {
     });
   };
 
+  if (verseLoading) {
+    return (
+      <main className="flex justify-center items-center min-h-screen bg-black p-4">
+        <div className="flex justify-center items-center">
+          <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <>
       <main className="flex flex-col items-center  min-h-screen bg-black p-4">
-        <div className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 rounded-lg shadow-2xl p-8 space-y-4 max-w-xl w-full mt-8 mb-4 border border-gray-600">
-          <h1 className="text-3xl font-bold text-gray-100">Today's Verse</h1>
-
-          <p className="text-lg leading-relaxed text-gray-300 ">{dailyVerseDetails.text}</p>
-
+        <div className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 rounded-lg shadow-2xl p-4 space-y-4 max-w-xl w-full mt-2 mb-0 border border-gray-600">
           <div className="flex items-center">
             <span className="inline-flex items-center px-4 py-1 rounded-full text-sm font-semibold bg-blue-500 text-gray-100">{formattedDate}</span>
           </div>
+          <p className="text-lg leading-relaxed text-gray-300 ">{dailyVerseDetails.text}</p>
         </div>
 
         <div className="w-full max-w-xl bg-black rounded-lg shadow-md p-6 text-white">
