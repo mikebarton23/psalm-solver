@@ -128,6 +128,8 @@ export function Game() {
   const [currentGuessIndex, setCurrentGuessIndex] = useState(0);
   const [gameWon, setGameWon] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [chapterProximity, setChapterProximity] = useState("");
+
   const [hintsUsed, setHintsUsed] = useState(0);
 
   const [showModal, setShowModal] = useState(false);
@@ -179,6 +181,46 @@ export function Game() {
 
     const isGuessCorrect = currentBook === dailyVerseDetails.title_short && parseInt(currentChapter, 10) === dailyVerseDetails.chapter && parseInt(currentVerse, 10) === dailyVerseDetails.verse;
 
+    // Function to map New Testament book names to numerical values
+    const bookToNumber = (bookName: any, newTestamentBooks: string | any[]) => {
+      const index = newTestamentBooks.indexOf(bookName);
+      return index !== -1 ? index + 1 : null; // Return null if the book is not found
+    };
+
+    type Proximity = "correct" | "close" | "far" | "unknown";
+    type GuessType = "book" | "chapter" | "verse";
+
+    const calculateProximity = (guess: string | number, correct: string | number, type: GuessType, newTestamentBooks: string[]): Proximity => {
+      let difference: number;
+
+      if (type === "book") {
+        // Assuming bookToNumber function returns a number or null
+        const guessNum = bookToNumber(guess as string, newTestamentBooks);
+        const correctNum = bookToNumber(correct as string, newTestamentBooks);
+        if (guessNum === null || correctNum === null) return "unknown"; // Handle case where the book is not found
+
+        difference = Math.abs(guessNum - correctNum);
+        if (difference === 0) {
+          return "correct";
+        } else if (difference > 0 && difference <= 2) {
+          return "close";
+        } else {
+          return "far";
+        }
+      } else {
+        // Convert guess and correct to numbers if they aren't already, assuming they should be numbers for chapters and verses
+        difference = Math.abs(Number(guess) - Number(correct));
+        if (difference === 0) {
+          return "correct";
+        } else if (difference > 0 && difference <= 5) {
+          // More lenient for chapters and verses
+          return "close";
+        } else {
+          return "far";
+        }
+      }
+    };
+
     const newGuess = {
       book: currentBook,
       chapter: currentChapter,
@@ -186,7 +228,13 @@ export function Game() {
       bookCorrect: currentBook === dailyVerseDetails.title_short,
       chapterCorrect: parseInt(currentChapter, 10) === dailyVerseDetails.chapter,
       verseCorrect: parseInt(currentVerse, 10) === dailyVerseDetails.verse,
+      // Apply the generalized function, specifically for New Testament
+      bookProximity: calculateProximity(currentBook, dailyVerseDetails.title_short, "book", newTestamentBooks),
+      chapterProximity: calculateProximity(parseInt(currentChapter, 10), dailyVerseDetails.chapter, "chapter", newTestamentBooks),
+      verseProximity: calculateProximity(parseInt(currentVerse, 10), dailyVerseDetails.verse, "verse", newTestamentBooks),
     };
+
+    console.log(newGuess);
 
     let updatedGuesses = [...guesses];
     updatedGuesses[currentGuessIndex] = newGuess;
@@ -263,25 +311,35 @@ export function Game() {
                 // Static text for previous guesses
                 <>
                   <div
-                    className={`col-span-6 p-2 ${
+                    className={`col-span-6 p-2 relative ${
                       guess?.book ? (guess.bookCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
-                    } h-11 flex items-center text-xl text-bold rounded`}
+                    } h-11 flex items-center text-xl font-bold rounded`}
                   >
                     {guess?.book || ""}
+                    {/* Ensure the indicator is within the visible bounds of its container */}
+                    <div
+                      className={`absolute bottom-0 left-0 right-0 h-1 ${guess?.bookProximity === "close" ? "bg-orange-500" : guess?.bookProximity === "far" ? "bg-blue-500" : "bg-transparent"}`}
+                    ></div>
                   </div>
                   <div
-                    className={`col-span-2 p-2 ${
+                    className={`col-span-2 p-2 relative ${
                       guess?.chapter ? (guess.chapterCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
-                    } h-11 flex items-center justify-center text-xl text-bold rounded`}
+                    } h-11 flex items-center justify-center text-xl font-bold rounded`}
                   >
                     {guess?.chapter || " "}
+                    <div
+                      className={`absolute bottom-0 left-0 right-0 h-1 ${guess?.chapterProximity === "close" ? "bg-orange-500" : guess?.chapterProximity === "far" ? "bg-blue-500" : "bg-transparent"}`}
+                    ></div>
                   </div>
                   <div
-                    className={`col-span-2 p-2 ${
+                    className={`col-span-2 p-2 relative ${
                       guess?.verse ? (guess.verseCorrect ? "bg-green-700" : "bg-gray-700") : "bg-black border border-gray-600"
-                    } h-11 flex items-center justify-center text-xl text-bold rounded`}
+                    } h-11 flex items-center justify-center text-xl font-bold rounded`}
                   >
                     {guess?.verse || " "}
+                    <div
+                      className={`absolute bottom-0 left-0 right-0 h-1 ${guess?.verseProximity === "close" ? "bg-orange-500" : guess?.verseProximity === "far" ? "bg-blue-500" : "bg-transparent"}`}
+                    ></div>
                   </div>
                 </>
               )}

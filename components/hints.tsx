@@ -22,11 +22,10 @@ const HintComponent: React.FC<HintComponentProps> = ({ dailyVerseDetails, hintsU
   const [revealedHints, setRevealedHints] = useState<Hint[]>([]);
 
   const hints = [
-    { key: "otnt", hint: `${dailyVerseDetails.otnt}` },
     { key: "chapters", hint: `Book has ${dailyVerseDetails.chapters} chapters` },
     { key: "category", hint: `Category of the book is ${dailyVerseDetails.category}` },
     { key: "total_verses_in_chapter", hint: `Chapter has ${dailyVerseDetails.total_verses_in_chapter} verses` },
-    { key: "pct_through", hint: `This verse is ${(dailyVerseDetails.pct_through * 100).toFixed(2)}% of the way through the Bible` },
+    { key: "pct_through", hint: `This verse is ${(dailyVerseDetails.pct_through * 100).toFixed(2)}% of the way through the New Testament` },
   ];
 
   const revealHint = () => {

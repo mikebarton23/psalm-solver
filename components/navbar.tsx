@@ -27,30 +27,65 @@ export default function Component() {
 
               <DialogDescription className="text-white text-md">
                 <p className="mb-4">Join us daily for a spiritual challenge using the American Standard Version of the Bible:</p>
-                <ul className="list-disc list-inside mb-4" style={{ marginLeft: "1.5rem", textIndent: "-1.5rem" }}>
-                  <li>
+
+                {/* Use divs for each point with icons */}
+                <div className="mb-4 flex items-start">
+                  <div className="text-purple-500 mr-2">📘</div>
+                  <p>
                     Each day, a new verse is featured; take a guess on the <strong>book</strong>, <strong>chapter</strong>, and <strong>verse number</strong>.
-                  </li>
-                  <li>
+                  </p>
+                </div>
+
+                <div className="mb-4 flex items-start">
+                  <div className="text-green-500 mr-2">💡</div>
+                  <p>
                     Not sure? Click <strong>"Reveal Hint"</strong> for a nudge in the right direction.
-                  </li>
-                  <li>
+                  </p>
+                </div>
+
+                <div className="mb-4 flex items-start">
+                  <div className="text-green-500 mr-2">✅</div>
+                  <p>
                     Correct parts of your guess will be marked in a <span className="text-green-500 font-bold">green outline</span>.
-                  </li>
-                  <li>
+                  </p>
+                </div>
+                {/* Proximity Explanation */}
+                <div className="mb-4 flex items-start">
+                  <div className="text-orange-500 mr-2">🟧</div>
+                  <p>
+                    Guesses that are <strong>close</strong> to the correct answer will be indicated with an <span className="text-orange-500 font-bold">orange line</span>. Close for the book is within
+                    2 books, and close for chapter and verse is within 5 verses.
+                  </p>
+                </div>
+                <div className="mb-4 flex items-start">
+                  <div className="text-blue-500 mr-2">🟦</div>
+                  <p>
+                    Guesses that are <strong>far</strong> from the correct answer will be indicated with a <span className="text-blue-500 font-bold">blue line</span>. Far for the book is more than 2
+                    books away, and far for chapter and verse is more than 5 away.
+                  </p>
+                </div>
+                <div className="mb-4 flex items-start">
+                  <div className="text-blue-500 mr-2">🤲</div>
+                  <p>
                     Got it right? Go on and <strong>share your success</strong> with friends!
-                  </li>
-                  <li>
+                  </p>
+                </div>
+
+                <div className="mb-4 flex items-start">
+                  <div className="text-orange-500 mr-2">🕛</div>
+                  <p>
                     A fresh verse appears <strong>every day at midnight</strong>—come back daily for a new challenge.
-                  </li>
-                </ul>
+                  </p>
+                </div>
+
                 <Separator className="my-4" />
+
                 <p>Love the game? Your donation supports our work and keeps the daily verses coming. Every bit helps!</p>
               </DialogDescription>
 
               <DialogFooter className="flex justify-center items-center mt-4">
                 <Button className="text-white bg-gradient-to-r from-purple-500 to-indigo-500">
-                  <a href="https://ko-fi.com/fantasygeniushq" target="_blank" rel="noopener noreferrer">
+                  <a href="https://ko-fi.com/builtbymike" target="_blank" rel="noopener noreferrer">
                     Donate
                   </a>
                 </Button>
@@ -58,7 +93,7 @@ export default function Component() {
             </DialogContent>
           </Dialog>
           <Button className="text-white bg-gradient-to-r from-purple-500 to-indigo-500">
-            <a href="https://ko-fi.com/fantasygeniushq" target="_blank" rel="noopener noreferrer">
+            <a href="https://ko-fi.com/builtbymike" target="_blank" rel="noopener noreferrer">
               Donate
             </a>
           </Button>
