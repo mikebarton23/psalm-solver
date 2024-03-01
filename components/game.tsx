@@ -147,7 +147,7 @@ export function Game() {
   });
 
   useEffect(() => {
-    fetch("/api/dailyVerse")
+    fetch("/api/dailyVerse2")
       .then((response) => response.json())
       .then((data) => setDailyVerseDetails(data))
       .catch((error) => console.error("Error fetching daily verse:", error));
