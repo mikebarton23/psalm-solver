@@ -270,8 +270,95 @@ export function Game() {
     }
   };
 
+  // Simplify your guess submission logic
   const submitGuess = () => {
-    handleGuessSubmit(new Event("submit") as FormEvent<HTMLFormElement>);
+    const isGuessCorrect = currentBook === dailyVerseDetails.title_short && parseInt(currentChapter, 10) === dailyVerseDetails.chapter && parseInt(currentVerse, 10) === dailyVerseDetails.verse;
+
+    // Calculate book number, proximity, etc.
+    // Essentially, move the logic here from handleGuessSubmit
+
+    // Function to map New Testament book names to numerical values
+    const bookToNumber = (bookName: any, newTestamentBooks: string | any[]) => {
+      const index = newTestamentBooks.indexOf(bookName);
+      return index !== -1 ? index + 1 : null; // Return null if the book is not found
+    };
+
+    type Proximity = "correct" | "close" | "far" | "unknown";
+    type GuessType = "book" | "chapter" | "verse";
+
+    const calculateProximity = (guess: string | number, correct: string | number, type: GuessType, newTestamentBooks: string[]): Proximity => {
+      let difference: number;
+
+      if (type === "book") {
+        // Assuming bookToNumber function returns a number or null
+        const guessNum = bookToNumber(guess as string, newTestamentBooks);
+        const correctNum = bookToNumber(correct as string, newTestamentBooks);
+        if (guessNum === null || correctNum === null) return "unknown"; // Handle case where the book is not found
+
+        difference = Math.abs(guessNum - correctNum);
+        if (difference === 0) {
+          return "correct";
+        } else if (difference > 0 && difference <= 2) {
+          return "close";
+        } else {
+          return "far";
+        }
+      } else {
+        // Convert guess and correct to numbers if they aren't already, assuming they should be numbers for chapters and verses
+        difference = Math.abs(Number(guess) - Number(correct));
+        if (difference === 0) {
+          return "correct";
+        } else if (difference > 0 && difference <= 5) {
+          // More lenient for chapters and verses
+          return "close";
+        } else {
+          return "far";
+        }
+      }
+    };
+    const newGuess = {
+      book: currentBook,
+      chapter: currentChapter,
+      verse: currentVerse,
+      bookCorrect: currentBook === dailyVerseDetails.title_short,
+      chapterCorrect: parseInt(currentChapter, 10) === dailyVerseDetails.chapter,
+      verseCorrect: parseInt(currentVerse, 10) === dailyVerseDetails.verse,
+      // Apply the generalized function, specifically for New Testament
+      bookProximity: calculateProximity(currentBook, dailyVerseDetails.title_short, "book", newTestamentBooks),
+      chapterProximity: calculateProximity(parseInt(currentChapter, 10), dailyVerseDetails.chapter, "chapter", newTestamentBooks),
+      verseProximity: calculateProximity(parseInt(currentVerse, 10), dailyVerseDetails.verse, "verse", newTestamentBooks),
+    };
+
+    console.log(newGuess);
+    let updatedGuesses = [...guesses];
+    updatedGuesses[currentGuessIndex] = newGuess;
+    setGuesses(updatedGuesses);
+    setGameWon(isGuessCorrect);
+    setCurrentGuessIndex(currentGuessIndex + 1);
+
+    if (currentGuessIndex < guesses.length - 1) {
+      setCurrentBook("");
+      setCurrentChapter("");
+      setCurrentVerse("");
+    }
+
+    if (isGuessCorrect) {
+      handleWin();
+    } else if (currentGuessIndex === guesses.length - 1 && !isGuessCorrect) {
+      handleLose();
+    }
+  };
+
+  // Event handler for form submission
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    submitGuess();
+  };
+
+  // Optionally, if you need a separate handler for button clicks
+  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    submitGuess();
   };
 
   const triggerConfetti = () => {
@@ -306,12 +393,12 @@ export function Game() {
         </div>
 
         <div className="w-full max-w-xl bg-black rounded-lg shadow-md p-6 text-white">
-          <div className="grid grid-cols-10 mb-4 gap-y-10  text-sm font-bold">
+          <div className="grid grid-cols-10 mb-4 gap-y-3  text-sm font-bold">
             <div className="col-span-6 text-left">Book</div>
             <div className="col-span-2 text-center">Chapter</div>
             <div className="col-span-2 text-center">Verse</div>
           </div>
-          <form onSubmit={handleGuessSubmit} className="w-full max-w-xl bg-black rounded-lg shadow-md p-6 text-white">
+          <form onSubmit={handleFormSubmit}>
             {guesses.map((guess, index) => (
               <div key={index} className="grid grid-cols-10 gap-x-2 gap-y-3 mb-2">
                 {index === currentGuessIndex && !gameWon ? (
