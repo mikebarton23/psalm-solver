@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"; // Import the button component
 
 type HintComponentProps = {
   dailyVerseDetails: {
-    otnt: string;
     chapters: number;
     category: string;
     total_verses_in_chapter: number;

@@ -148,6 +148,12 @@ export function Game() {
     book_order_in_testament: 0,
     quiz_date: "",
     total_verses_in_chapter: 0,
+    next_verse: "",
+    previous_verse: "",
+    hint_1: "",
+    hint_2: "",
+    hint_3: "",
+    hint_4: "",
   });
   const [verseLoading, setVerseLoading] = useState(true);
 
