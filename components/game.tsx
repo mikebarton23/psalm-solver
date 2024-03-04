@@ -6,6 +6,7 @@ import HintComponent from "./hints";
 import BibleBookSelect from "./ui/bibleBookSelect";
 import { oldTestamentBooks, newTestamentBooks } from "../data/BibleBooks";
 import { FormEvent } from "react";
+import axios from "axios";
 import { toast } from "sonner";
 
 function formatDate(dateString: string) {
@@ -162,6 +163,24 @@ export function Game() {
         setVerseLoading(false); // Stop loading if there's an error
       });
   }, []);
+
+  useEffect(() => {
+    // Function to record the visit
+    const recordVisit = async () => {
+      try {
+        await axios.post("/api/pageVisit", {
+          page: "game", // Assuming 'game' is the identifier for this page
+          // You do not need to send visitorIp since you're not using it
+        });
+        console.log("Visit recorded successfully");
+      } catch (error) {
+        console.error("Error recording visit: ", error);
+      }
+    };
+
+    // Call the function to record the visit when the component mounts
+    recordVisit();
+  }, []); // The empty array ensures this effect runs only once when the component mounts
 
   const formattedDate = formatDate(dailyVerseDetails.quiz_date);
 

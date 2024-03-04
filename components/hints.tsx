@@ -9,6 +9,12 @@ type HintComponentProps = {
     category: string;
     total_verses_in_chapter: number;
     pct_through: number;
+    previous_verse: string;
+    next_verse: string;
+    hint_1: string;
+    hint_2: string;
+    hint_3: string;
+    hint_4: string;
   };
   hintsUsed: number;
   setHintsUsed: React.Dispatch<React.SetStateAction<number>>;
@@ -22,10 +28,15 @@ const HintComponent: React.FC<HintComponentProps> = ({ dailyVerseDetails, hintsU
   const [revealedHints, setRevealedHints] = useState<Hint[]>([]);
 
   const hints = [
+    { key: "previous_verse", hint: `Previous verse: ${dailyVerseDetails.previous_verse}` },
+    { key: "next_verse", hint: `Next verse: ${dailyVerseDetails.next_verse}` },
+    { key: "1", hint: `${dailyVerseDetails.hint_1}` },
+    { key: "2", hint: `${dailyVerseDetails.hint_2}` },
+    { key: "3", hint: `${dailyVerseDetails.hint_3}` },
+    { key: "4", hint: `${dailyVerseDetails.hint_4}` },
     { key: "chapters", hint: `Book has ${dailyVerseDetails.chapters} chapters` },
-    { key: "category", hint: `Category of the book is ${dailyVerseDetails.category}` },
     { key: "total_verses_in_chapter", hint: `Chapter has ${dailyVerseDetails.total_verses_in_chapter} verses` },
-    { key: "pct_through", hint: `This verse is ${(dailyVerseDetails.pct_through * 100).toFixed(2)}% of the way through the New Testament` },
+    // { key: "pct_through", hint: `This verse is ${(dailyVerseDetails.pct_through * 100).toFixed(2)}% of the way through the New Testament` },
   ];
 
   const revealHint = () => {
