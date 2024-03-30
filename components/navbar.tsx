@@ -111,6 +111,7 @@ export default function Component() {
               </DialogDescription>
             </DialogContent>
           </Dialog>
+
           {/* Info Button */}
         </div>
       </div>
