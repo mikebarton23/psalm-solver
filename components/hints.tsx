@@ -27,14 +27,14 @@ const HintComponent: React.FC<HintComponentProps> = ({ dailyVerseDetails, hintsU
   const [revealedHints, setRevealedHints] = useState<Hint[]>([]);
 
   const hints = [
-    { key: "previous_verse", hint: `Previous verse: ${dailyVerseDetails.previous_verse}` },
-    { key: "next_verse", hint: `Next verse: ${dailyVerseDetails.next_verse}` },
-    { key: "1", hint: `${dailyVerseDetails.hint_1}` },
-    { key: "2", hint: `${dailyVerseDetails.hint_2}` },
-    { key: "3", hint: `${dailyVerseDetails.hint_3}` },
-    { key: "4", hint: `${dailyVerseDetails.hint_4}` },
-    { key: "chapters", hint: `Book has ${dailyVerseDetails.chapters} chapters` },
-    { key: "total_verses_in_chapter", hint: `Chapter has ${dailyVerseDetails.total_verses_in_chapter} verses` },
+    { key: "previous_verse", hint: `Previous verse: ${dailyVerseDetails?.previous_verse}` },
+    { key: "next_verse", hint: `Next verse: ${dailyVerseDetails?.next_verse}` },
+    { key: "1", hint: `${dailyVerseDetails?.hint_1}` },
+    { key: "2", hint: `${dailyVerseDetails?.hint_2}` },
+    { key: "3", hint: `${dailyVerseDetails?.hint_3}` },
+    { key: "4", hint: `${dailyVerseDetails?.hint_4}` },
+    { key: "chapters", hint: `Book has ${dailyVerseDetails?.chapters} chapters` },
+    { key: "total_verses_in_chapter", hint: `Chapter has ${dailyVerseDetails?.total_verses_in_chapter} verses` },
     // { key: "pct_through", hint: `This verse is ${(dailyVerseDetails.pct_through * 100).toFixed(2)}% of the way through the New Testament` },
   ];
 

@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import HintComponent from "./hints";
 import BibleBookSelect from "./ui/bibleBookSelect";
 import { oldTestamentBooks, newTestamentBooks } from "../data/BibleBooks";
-import { FormEvent } from "react";
+import { supabase } from "@/lib/supabaseClient";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -44,17 +44,24 @@ function Modal({
   const emojiGrid = guesses
     .filter((guess) => guess !== null)
     .map((guess, index) => {
-      const bookCorrect = guess.bookCorrect ? "🟩" : "⬛";
-      const chapterCorrect = guess.chapterCorrect ? "🟩" : "⬛";
-      const verseCorrect = guess.verseCorrect ? "🟩" : "⬛";
+      // Determine the emoji for each part of the guess based on correctness or proximity
+      const bookEmoji = guess.bookCorrect ? "🟩" : guess.bookProximity === "close" ? "🟧" : "⬛";
+      const chapterEmoji = guess.chapterCorrect ? "🟩" : guess.chapterProximity === "close" ? "🟧" : "⬛";
+      const verseEmoji = guess.verseCorrect ? "🟩" : guess.verseProximity === "close" ? "🟧" : "⬛";
 
-      return <div key={index}>{`${bookCorrect}${chapterCorrect}${verseCorrect}`}</div>;
+      return <div key={index}>{`${bookEmoji}${chapterEmoji}${verseEmoji}`}</div>;
     });
 
   const shareResults = () => {
     const emojiGridText = guesses
       .filter((guess) => guess !== null)
-      .map((guess) => `${guess.bookCorrect ? "🟩" : "⬛"}${guess.chapterCorrect ? "🟩" : "⬛"}${guess.verseCorrect ? "🟩" : "⬛"}`)
+      .map((guess) => {
+        const bookEmoji = guess.bookCorrect ? "🟩" : guess.bookProximity === "close" ? "🟧" : "⬛";
+        const chapterEmoji = guess.chapterCorrect ? "🟩" : guess.chapterProximity === "close" ? "🟧" : "⬛";
+        const verseEmoji = guess.verseCorrect ? "🟩" : guess.verseProximity === "close" ? "🟧" : "⬛";
+
+        return `${bookEmoji}${chapterEmoji}${verseEmoji}`;
+      })
       .join("\n"); // Use '\n' for new lines in text, not '<br/>'
 
     const hintsUsedEmojis = "💡".repeat(hintsUsed);
@@ -136,6 +143,7 @@ export function Game() {
 
   const [showModal, setShowModal] = useState(false);
   const [dailyVerseDetails, setDailyVerseDetails] = useState({
+    id: 0,
     title_short: "",
     chapter: 0,
     verse: 0,
@@ -158,37 +166,32 @@ export function Game() {
   const [verseLoading, setVerseLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/dailyVerse2")
-      .then((response) => response.json())
-      .then((data) => {
-        setDailyVerseDetails(data);
-        setVerseLoading(false); // Stop loading after data is fetched
-      })
-      .catch((error) => {
-        console.error("Error fetching daily verse:", error);
-        setVerseLoading(false); // Stop loading if there's an error
-      });
-  }, []);
-
-  useEffect(() => {
-    // Function to record the visit
-    const recordVisit = async () => {
+    const fetchVerse = async () => {
+      setVerseLoading(true);
       try {
-        await axios.post("/api/pageVisit", {
-          page: "game", // Assuming 'game' is the identifier for this page
-          // You do not need to send visitorIp since you're not using it
-        });
-        console.log("Visit recorded successfully");
+        const { data: verseData, error: verseError } = await supabase.from("daily_verse_view").select(""); // Adjust your select query as needed
+        if (verseError) {
+          throw verseError;
+        }
+
+        setDailyVerseDetails(verseData[0] as unknown as typeof dailyVerseDetails); // Update the type of verseData
       } catch (error) {
-        console.error("Error recording visit: ", error);
+        console.error("Error fetching verse");
+      } finally {
+        setVerseLoading(false);
       }
     };
 
-    // Call the function to record the visit when the component mounts
-    recordVisit();
-  }, []); // The empty array ensures this effect runs only once when the component mounts
+    fetchVerse();
+  }, []);
 
-  const formattedDate = formatDate(dailyVerseDetails.quiz_date);
+  useEffect(() => {
+    if (gameWon || currentGuessIndex === guesses.length) {
+      submitGameResults(gameWon, guesses, hintsUsed, currentGuessIndex);
+    }
+  }, [gameWon, guesses, currentGuessIndex]);
+
+  const formattedDate = formatDate(dailyVerseDetails?.quiz_date);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -199,6 +202,40 @@ export function Game() {
     setCurrentBook(bookName);
     setShowSuggestions(false);
   };
+
+  async function submitGameResults(gameWon: boolean, guesses: any[], hintsUsed: number, currentGuessIndex: number) {
+    console.log("guesses", guesses);
+    // Filter out null guesses before counting
+    const validGuesses = guesses.filter((guess) => guess !== null);
+
+    // Assuming the last valid guess contains the results of the final guess
+    const lastGuess = validGuesses[validGuesses.length - 1];
+    console.log("lastGuess", lastGuess);
+
+    const bookCorrect = lastGuess ? lastGuess.bookCorrect : false;
+    const chapterCorrect = lastGuess ? lastGuess.chapterCorrect : false;
+    const verseCorrect = lastGuess ? lastGuess.verseCorrect : false;
+
+    // Submit the game results to the "submissions" table
+    const { data, error } = await supabase.from("submissions").insert([
+      {
+        won: gameWon,
+        guesses: currentGuessIndex, // Only count the non-null guesses
+        hints: hintsUsed,
+        book_correct: bookCorrect,
+        chapter_correct: chapterCorrect,
+        verse_correct: verseCorrect,
+        verse_id: dailyVerseDetails.id, // Assuming this is the ID of the daily verse
+        // user_id is omitted, it will remain null as per the initial request
+      },
+    ]);
+
+    if (error) {
+      console.error("Error submitting game results:", error);
+    } else {
+      console.log("Game results submitted successfully:", data);
+    }
+  }
 
   const handleWin = () => {
     setShowModal(true);
@@ -357,7 +394,12 @@ export function Game() {
     console.log(newGuess);
     let updatedGuesses = [...guesses];
     updatedGuesses[currentGuessIndex] = newGuess;
-    setGuesses(updatedGuesses);
+    setGuesses((previousGuesses) => {
+      const updatedGuesses = [...previousGuesses];
+      updatedGuesses[currentGuessIndex] = newGuess;
+      return updatedGuesses;
+    });
+
     setGameWon(isGuessCorrect);
     setCurrentGuessIndex(currentGuessIndex + 1);
 
@@ -414,7 +456,7 @@ export function Game() {
           <div className="flex items-center">
             <span className="inline-flex items-center px-4 py-1 rounded-full text-xs md:text-md  bg-blue-500 text-gray-100">{formattedDate}</span>
           </div>
-          <p className="text-gray-300 text-sm md:text-lg">{dailyVerseDetails.text}</p>
+          <p className="text-gray-300 text-sm md:text-lg">{dailyVerseDetails?.text}</p>
         </div>
 
         <div className="w-full max-w-xl bg-black rounded-lg shadow-md p-6 text-white">
